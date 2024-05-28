@@ -1,9 +1,10 @@
 export class BirthdayService {
-  constructor(employeeRepository) {
+  constructor(employeeRepository, mailSender) {
     this.employeeRepository = employeeRepository;
+    this.mailSender = mailSender;
   }
 
-  sendGreetings(ourDate, smtpUrl, smtpPort, transport) {
+  sendGreetings(ourDate, smtpUrl, smtpPort) {
     const employees = this.employeeRepository.getEmployees()
       .filter((employee) => employee.isBirthday(ourDate));
 
@@ -16,7 +17,7 @@ export class BirthdayService {
         subject: "Happy Birthday!",
         text: `Happy Birthday, dear ${employee.getFirstName()}!`,
       };
-      transport.sendMail(message);
+      this.mailSender.sendMail(message);
     });
   }
 }

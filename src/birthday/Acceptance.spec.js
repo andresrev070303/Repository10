@@ -2,6 +2,7 @@ import { OurDate } from "./OurDate";
 import { InMemoryTransport } from "./InMemoryTransport";
 import { BirthdayService } from "./BirthdayService";
 import { FileEmployeeRepository } from "./FileEmployeeRepository";
+import { TransportMailSender } from "./TransportMailSender";
 
 describe("Acceptance", () => {
   const SMTP_PORT = 25;
@@ -13,15 +14,15 @@ describe("Acceptance", () => {
   beforeEach(() => {
     transport = new InMemoryTransport();
     const employeeRepository = new FileEmployeeRepository(FILENAME);
-    birthdayService = new BirthdayService(employeeRepository);
+    const mailSender = new TransportMailSender(transport);
+    birthdayService = new BirthdayService(employeeRepository, mailSender);
   });
 
   it("base scenario", () => {
     birthdayService.sendGreetings(
       new OurDate("2008/10/08"),
       SMTP_URL,
-      SMTP_PORT,
-      transport
+      SMTP_PORT
     );
 
     expect(transport.messagesSent.length).toEqual(1);
@@ -37,8 +38,7 @@ describe("Acceptance", () => {
     birthdayService.sendGreetings(
       new OurDate("2008/01/01"),
       SMTP_URL,
-      SMTP_PORT,
-      transport
+      SMTP_PORT
     );
 
     expect(transport.messagesSent.length).toEqual(0);
@@ -48,8 +48,7 @@ describe("Acceptance", () => {
     birthdayService.sendGreetings(
       new OurDate("2008/10/08"),
       SMTP_URL,
-      SMTP_PORT,
-      transport
+      SMTP_PORT
     );
 
     const message = transport.messagesSent[0];
